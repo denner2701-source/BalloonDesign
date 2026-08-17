@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BalloonDesign - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-surface-variant": "#5c3f46",
+                "tertiary": "#9e316e",
+                "on-secondary-container": "#365581",
+                "secondary-container": "#accbfe",
+                "tertiary-container": "#bd4b87",
+                "primary": "#b60059",
+                "tertiary-fixed-dim": "#ffafd2",
+                "surface-container-low": "#eff4ff",
+                "on-secondary-fixed": "#001c3b",
+                "inverse-on-surface": "#eaf1ff",
+                "secondary-fixed": "#d5e3ff",
+                "surface-variant": "#d3e4fe",
+                "on-tertiary-fixed": "#3d0025",
+                "on-primary-fixed-variant": "#8f0044",
+                "on-primary-container": "#fffbff",
+                "tertiary-fixed": "#ffd8e7",
+                "primary-fixed-dim": "#ffb1c4",
+                "surface": "#f8f9ff",
+                "on-tertiary": "#ffffff",
+                "inverse-primary": "#ffb1c4",
+                "on-surface": "#0b1c30",
+                "surface-tint": "#ba005b",
+                "on-error-container": "#93000a",
+                "outline": "#906e76",
+                "inverse-surface": "#213145",
+                "error-container": "#ffdad6",
+                "on-tertiary-container": "#fffbff",
+                "surface-container-highest": "#d3e4fe",
+                "primary-container": "#e30071",
+                "surface-container-high": "#dce9ff",
+                "on-secondary-fixed-variant": "#274773",
+                "on-primary": "#ffffff",
+                "surface-dim": "#cbdbf5",
+                "on-secondary": "#ffffff",
+                "on-error": "#ffffff",
+                "secondary-fixed-dim": "#a9c8fb",
+                "surface-container": "#e5eeff",
+                "surface-bright": "#f8f9ff",
+                "outline-variant": "#e5bcc5",
+                "surface-container-lowest": "#ffffff",
+                "on-primary-fixed": "#3f001a",
+                "background": "#f8f9ff",
+                "secondary": "#405f8c",
+                "primary-fixed": "#ffd9e1",
+                "on-tertiary-fixed-variant": "#831957",
+                "error": "#ba1a1a",
+                "on-background": "#0b1c30"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "gutter": "24px",
+                "container-max": "1280px",
+                "margin-desktop": "40px",
+                "margin-mobile": "16px",
+                "unit": "4px"
+        },
+        "fontFamily": {
+                "headline-lg-mobile": [
+                        "Hanken Grotesk"
+                ],
+                "display": [
+                        "Hanken Grotesk"
+                ],
+                "headline-md": [
+                        "Hanken Grotesk"
+                ],
+                "headline-lg": [
+                        "Hanken Grotesk"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "body-sm": [
+                        "Inter"
+                ],
+                "label-md": [
+                        "Inter"
+                ],
+                "body-lg": [
+                        "Inter"
+                ],
+                "label-sm": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "headline-lg-mobile": [
+                        "28px",
+                        {
+                                "lineHeight": "36px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "display": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "800"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-sm": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "fontWeight": "500"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+        .card-hover {
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(182, 0, 89, 0.15), 0 8px 10px -6px rgba(182, 0, 89, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden antialiased">
+<!-- TopNavBar -->
+<nav class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md fixed top-0 right-0 z-40 border-b border-outline-variant dark:border-outline shadow-sm flex justify-between items-center w-[calc(100%-16rem)] ml-64 px-8 h-16">
+<div class="flex items-center gap-4">
+<h1 class="font-display text-headline-sm font-bold text-primary">Dashboard</h1>
+</div>
+<div class="flex items-center gap-6">
+<!-- Global Actions -->
+<div class="flex items-center gap-4">
+<button class="font-label-md text-label-md text-primary bg-surface border border-primary px-6 py-2 rounded-full hover:bg-primary-fixed transition-colors flex items-center gap-2" onclick="window.location.href='budget.html'">
+<span class="material-symbols-outlined text-[18px]" data-icon="request_quote">request_quote</span>
+                Novo Orçamento
+            </button>
+<div class="flex items-center gap-3 ml-2 border-l border-outline-variant pl-6">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-all text-on-surface-variant dark:text-surface-variant" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-all text-on-surface-variant dark:text-surface-variant" data-icon="settings">settings</span>
+<div class="w-10 h-10 rounded-full bg-secondary-container overflow-hidden border-2 border-primary cursor-pointer hover:scale-105 transition-transform" id="user-menu-btn">
+<img alt="Avatar do usuário" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACCDQ4DjrhBsBjBkrdrL3lKmqFJnA2c99VUs7OsILqh0X00ZAv1BpsDaAADqxJvb4RAvqBx4fGxhIso_fu1Qd2V-MfhoQH7VF_IEnPLOBg1lTjpGtt2yGP3k0llPqsjGj18H8hTIPFJYfZStK4WGBC6IqBR_sQ_PNHUBo6kG7ppMFK0gEIUvPUSt4iYFmQC0q8q9JzNe6peQG-RipROy8RltSRVv2w4FwgVtkUsU5c7jKCw8i9iO12pw"/>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<nav class="bg-surface dark:bg-inverse-surface h-screen w-64 fixed left-0 top-0 border-r border-outline-variant dark:border-outline flex flex-col py-6 px-4 z-50">
+<div class="mb-8 px-2 flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-headline-md font-display shadow-md shadow-primary/30">B</div>
+<div>
+<h2 class="font-display text-headline-md font-extrabold text-primary dark:text-inverse-primary leading-tight tracking-tight">BalloonDesign</h2>
+<span class="text-tertiary-container font-label-sm text-label-sm uppercase tracking-widest font-bold">Pro</span>
+</div>
+</div>
+<a class="mb-8 w-full bg-primary text-on-primary font-label-md text-label-md font-bold py-3 px-4 rounded-full flex justify-center items-center gap-2 hover:bg-primary-container transition-all shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/40 active:scale-95" href="javascript:void(0)" id="btn-novo-projeto">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+        Novo Projeto
+    </a>
+<ul class="flex-1 space-y-2">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-primary dark:text-inverse-primary font-bold bg-primary-fixed/50 dark:bg-primary-fixed/10 hover:bg-primary-fixed transition-colors font-body-md text-body-md" href="index.html">
+<span class="material-symbols-outlined text-primary" data-icon="home" data-weight="fill" style="font-variation-settings: 'FILL' 1;">home</span>
+                Início
+            </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant/20 transition-colors font-body-md text-body-md font-medium" href="projects.html">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+                Meus Projetos
+            </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant/20 transition-colors font-body-md text-body-md font-medium" href="budget.html">
+<span class="material-symbols-outlined" data-icon="request_quote">request_quote</span>
+                Orçamentos
+            </a>
+</li>
+<li class="pt-4 pb-2">
+<span class="px-4 text-xs font-bold uppercase tracking-wider text-outline">Ferramentas</span>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant/20 transition-colors font-body-md text-body-md font-medium" href="editor-3d.html">
+<span class="material-symbols-outlined" data-icon="3d_rotation">3d_rotation</span>
+                Editor 3D
+            </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant/20 transition-colors font-body-md text-body-md font-medium" href="editor-mosaic.html">
+<span class="material-symbols-outlined" data-icon="grid_on">grid_on</span>
+                Editor de Mosaico
+            </a>
+</li>
+</ul>
+<div class="mt-auto border-t border-outline-variant pt-4 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant/20 transition-colors font-body-md text-body-md font-medium" href="admin.html" id="link-admin" style="display: none;">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+            Painel Admin
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant/20 transition-colors font-body-md text-body-md font-medium" href="javascript:void(0)" id="btn-logout">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+            Sair
+        </a>
+</div>
+</nav>
+<!-- Main Workspace -->
+<main class="ml-64 mt-16 h-[calc(100vh-4rem)] overflow-y-auto w-[calc(100%-16rem)] p-8 bg-surface-container-lowest">
+<div class="max-w-container-max mx-auto space-y-10">
+<!-- Welcome Section -->
+<section class="flex justify-between items-end bg-gradient-to-r from-primary-fixed to-surface-container-high p-8 rounded-3xl border border-outline-variant/30 shadow-sm relative overflow-hidden">
+<div class="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="relative z-10">
+<h2 class="font-display text-display text-primary mb-2">Olá, <span id="user-first-name">Designer</span>! 👋</h2>
+<p class="text-body-lg text-on-surface-variant max-w-2xl">Bem-vindo ao BalloonDesign. O que vamos criar hoje? Escolha uma ferramenta abaixo ou continue de onde parou.</p>
+</div>
+<div class="hidden lg:block relative z-10">
+<div class="flex -space-x-3">
+<div class="w-12 h-12 rounded-full border-2 border-surface bg-primary text-on-primary flex items-center justify-center font-bold">+12</div>
+<div class="w-12 h-12 rounded-full border-2 border-surface bg-tertiary text-on-tertiary flex items-center justify-center font-bold">Projetos</div>
+</div>
+</div>
+</section>
+<!-- Quick Actions / Tools -->
+<section>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">apps</span>
+                Ferramentas Criativas
+            </h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Editor 3D Card -->
+<a class="card-hover group block bg-surface rounded-3xl p-6 border border-outline-variant/50 cursor-pointer relative overflow-hidden" href="editor-3d.html">
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary-container/30 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+<div class="w-14 h-14 rounded-full bg-secondary-container text-secondary flex items-center justify-center mb-4 relative z-10">
+<span class="material-symbols-outlined text-3xl" data-icon="3d_rotation">3d_rotation</span>
+</div>
+<h4 class="font-headline-md text-xl font-bold text-on-surface mb-2 relative z-10">Editor 3D</h4>
+<p class="text-body-sm text-on-surface-variant relative z-10">Crie guirlandas, arcos orgânicos e cenários complexos em um ambiente 3D interativo.</p>
+</a>
+<!-- Mosaico Card -->
+<a class="card-hover group block bg-surface rounded-3xl p-6 border border-outline-variant/50 cursor-pointer relative overflow-hidden" href="editor-mosaic.html">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed/50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+<div class="w-14 h-14 rounded-full bg-primary-fixed text-primary flex items-center justify-center mb-4 relative z-10">
+<span class="material-symbols-outlined text-3xl" data-icon="grid_on">grid_on</span>
+</div>
+<h4 class="font-headline-md text-xl font-bold text-on-surface mb-2 relative z-10">Editor de Mosaico</h4>
+<p class="text-body-sm text-on-surface-variant relative z-10">Planeje mosaicos e painéis de balões com precisão milimétrica e cálculo automático.</p>
+</a>
+<!-- Orçamento Card -->
+<a class="card-hover group block bg-surface rounded-3xl p-6 border border-outline-variant/50 cursor-pointer relative overflow-hidden" href="budget.html">
+<div class="absolute top-0 right-0 w-32 h-32 bg-tertiary-fixed/50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+<div class="w-14 h-14 rounded-full bg-tertiary-fixed text-tertiary flex items-center justify-center mb-4 relative z-10">
+<span class="material-symbols-outlined text-3xl" data-icon="calculate">calculate</span>
+</div>
+<h4 class="font-headline-md text-xl font-bold text-on-surface mb-2 relative z-10">Orçamentos</h4>
+<p class="text-body-sm text-on-surface-variant relative z-10">Gere orçamentos profissionais em PDF baseados nos seus projetos com um clique.</p>
+</a>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Recent Projects -->
+<section class="lg:col-span-2">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">history</span>
+                        Projetos Recentes
+                    </h3>
+<a class="text-primary font-label-md text-label-md hover:underline flex items-center gap-1" href="projects.html">
+                        Ver todos <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<div class="bg-surface rounded-3xl border border-outline-variant/50 overflow-hidden">
+<ul class="divide-y divide-outline-variant/30">
+<li class="p-4 hover:bg-surface-container-low transition-colors cursor-pointer flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-secondary-container text-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">3d_rotation</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface text-body-md">Arco Desconstruído - Casamento Ana</h4>
+<p class="text-body-sm text-on-surface-variant">Editado há 2 horas</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-3 py-1 bg-surface-container rounded-full text-label-sm font-label-md text-on-surface-variant">3D</span>
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary-fixed rounded-full transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</li>
+<li class="p-4 hover:bg-surface-container-low transition-colors cursor-pointer flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">grid_on</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface text-body-md">Mosaico Letra "A" - Aniversário 15</h4>
+<p class="text-body-sm text-on-surface-variant">Editado ontem</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-3 py-1 bg-surface-container rounded-full text-label-sm font-label-md text-on-surface-variant">Mosaico</span>
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary-fixed rounded-full transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</li>
+<li class="p-4 hover:bg-surface-container-low transition-colors cursor-pointer flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-tertiary-fixed text-tertiary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">calculate</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface text-body-md">Orçamento Festas S/A</h4>
+<p class="text-body-sm text-on-surface-variant">Criado dia 12/05</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-3 py-1 bg-surface-container rounded-full text-label-sm font-label-md text-on-surface-variant">Orçamento</span>
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary-fixed rounded-full transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</li>
+</ul>
+</div>
+</section>
+<!-- System Status -->
+<section class="lg:col-span-1">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">dns</span>
+                    Status do Sistema
+                </h3>
+<div class="bg-surface rounded-3xl border border-outline-variant/50 p-6 space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-[#000000] text-white flex items-center justify-center">
+<svg fill="none" height="18" viewbox="0 0 76 65" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="#ffffff"></path></svg>
+</div>
+<div>
+<h5 class="font-bold text-on-surface text-body-md">Vercel Edge</h5>
+<p class="text-body-sm text-on-surface-variant">Hospedagem UI</p>
+</div>
+</div>
+<div class="flex items-center gap-2 bg-[#dcfce7] text-[#166534] px-3 py-1 rounded-full border border-[#bbf7d0]">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22c55e] opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#16a34a]"></span>
+</span>
+<span class="font-label-sm text-xs font-bold uppercase tracking-wider">Online</span>
+</div>
+</div>
+<div class="h-px bg-outline-variant/30 w-full"></div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-[#1c1c1c] text-[#3ECF8E] flex items-center justify-center">
+<svg fill="none" height="20" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M11.9997 2.45781C12.3023 2.45781 12.5925 2.57793 12.8065 2.79188L21.3653 11.3507C21.9511 11.9365 21.9511 12.8863 21.3653 13.4721C21.0543 13.7831 20.6128 13.9109 20.1837 13.8139L14.4172 12.5085C14.1953 12.4583 13.9622 12.5694 13.8824 12.7758L12.7845 15.6192C12.7166 15.7951 12.8028 15.9904 12.9818 16.0664L19.4678 18.8207C19.7423 18.9372 19.8665 19.2559 19.741 19.5291L18.8924 21.3768C18.7303 21.7297 18.2936 21.8488 17.9624 21.63L2.63402 11.5202C2.17066 11.2146 2.05141 10.5847 2.38547 10.1384L11.1929 2.79461C11.4116 2.5762 11.7013 2.45781 11.9997 2.45781Z" fill="currentColor" fill-rule="evenodd"></path></svg>
+</div>
+<div>
+<h5 class="font-bold text-on-surface text-body-md">Supabase DB</h5>
+<p class="text-body-sm text-on-surface-variant">Banco &amp; Auth</p>
+</div>
+</div>
+<div class="flex items-center gap-2 bg-[#dcfce7] text-[#166534] px-3 py-1 rounded-full border border-[#bbf7d0]">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22c55e] opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#16a34a]"></span>
+</span>
+<span class="font-label-sm text-xs font-bold uppercase tracking-wider">Online</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-4 mt-4 text-center">
+<p class="text-label-sm text-on-surface-variant mb-1">Última sincronização</p>
+<p class="font-bold text-body-sm text-on-surface" id="sync-time">Agora mesmo</p>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<script>
+    // Configurações do Supabase extraídas do documento
+    const SUPABASE_URL = 'https://oebykvdaiubfjrydssid.supabase.co/';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lYnlrdmRhaXViZmpyeWRzc2lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzIzNTksImV4cCI6MjEwMjUwODM1OX0.kMktYk4YIE6MQi1LLbF-aWnIryfZ3kqCEUztgK7-Trk';
+
+    // Inicializa o cliente Supabase
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function checkAuth() {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (!session) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Simula verificação de admin com base no e-mail fornecido
+        const mockUserEmail = "dennerangeli@hotmail.com"; // Simula e-mail do usuário logado (substituir por session.user.email)
+        
+        if (session && session.user) {
+            document.getElementById('user-first-name').textContent = session.user.email.split('@')[0];
+            
+            if (session.user.email === 'dennerangeli@hotmail.com') {
+                document.getElementById('link-admin').style.display = 'flex';
+                // Lógica de redirecionamento imediato caso a página inicial não seja desejada para admin
+                // window.location.href = 'admin.html';
+            }
+        } else {
+            // Mock visual logic se não houver backend real respondendo
+            if (mockUserEmail === 'dennerangeli@hotmail.com') {
+                document.getElementById('link-admin').style.display = 'flex';
+            }
+        }
+    }
+
+    // Ação de Logout
+    document.getElementById('btn-logout').addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        window.location.href = 'login.html';
+    });
+
+    // Atualiza hora de sync
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('sync-time').textContent = now.toLocaleTimeString('pt-BR');
+    }, 60000); // Atualiza a cada minuto
+
+    // Inicialização
+    checkAuth();
+
+</script>
+</body></html>

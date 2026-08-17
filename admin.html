@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Balloon Admin Panel</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "background": "#fef7ff",
+                      "tertiary-fixed-dim": "#80d0f0",
+                      "on-secondary-container": "#2e2040",
+                      "surface-container-low": "#fbf2fb",
+                      "secondary-container": "#eedcff",
+                      "outline": "#907898",
+                      "on-tertiary-fixed-variant": "#005580",
+                      "inverse-primary": "#f0a0cc",
+                      "tertiary-fixed": "#c8eaff",
+                      "primary-container": "#f080c0",
+                      "primary-fixed-dim": "#f0a0cc",
+                      "on-error-container": "#9b1c1c",
+                      "surface-variant": "#f2e8f2",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-fixed-variant": "#4a3068",
+                      "on-background": "#2e1a28",
+                      "secondary-fixed-dim": "#c8a8e8",
+                      "surface-dim": "#e0d6e0",
+                      "surface-container": "#f8eef8",
+                      "primary-fixed": "#ffd6ee",
+                      "secondary": "#7c52aa",
+                      "on-primary-container": "#2e1a28",
+                      "on-secondary-fixed": "#1a1030",
+                      "on-primary-fixed-variant": "#a02070",
+                      "on-surface-variant": "#604868",
+                      "surface-container-highest": "#ece2ec",
+                      "inverse-surface": "#2e1a28",
+                      "on-primary": "#ffffff",
+                      "on-error": "#ffffff",
+                      "error": "#e53e3e",
+                      "error-container": "#ffe8e8",
+                      "on-secondary": "#ffffff",
+                      "surface-container-high": "#f2e8f2",
+                      "surface-bright": "#fef7ff",
+                      "tertiary-container": "#40c0ee",
+                      "tertiary": "#0096cc",
+                      "on-surface": "#2e1a28",
+                      "secondary-fixed": "#eedcff",
+                      "outline-variant": "#dcc8e0",
+                      "inverse-on-surface": "#fef7ff",
+                      "on-primary-fixed": "#3d0028",
+                      "surface-tint": "#e040a0",
+                      "on-tertiary-container": "#00334d",
+                      "on-tertiary-fixed": "#001a33",
+                      "primary": "#e040a0",
+                      "surface": "#fef7ff",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["DM Sans", "sans-serif"],
+                      "display": ["DM Sans", "sans-serif"],
+                      "body": ["DM Sans", "sans-serif"],
+                      "label": ["DM Sans", "sans-serif"]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: #fef7ff;
+            color: #2e1a28;
+        }
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Candy Shadows */
+        .shadow-candy-primary { box-shadow: 0 8px 24px rgba(224, 64, 160, 0.15); }
+        .shadow-candy-secondary { box-shadow: 0 8px 24px rgba(124, 82, 170, 0.15); }
+        .shadow-candy-tertiary { box-shadow: 0 8px 24px rgba(0, 150, 204, 0.15); }
+        .shadow-candy-surface { box-shadow: 0 8px 32px rgba(124, 82, 170, 0.08); }
+
+        /* Bouncy Hover */
+        .hover-bounce {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+        }
+        .hover-bounce:hover {
+            transform: scale(1.03) translateY(-4px);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #f080c0; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e040a0; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden bg-background font-body">
+<!-- SideNavBar (From JSON) -->
+<nav class="hidden md:flex flex-col h-screen w-64 rounded-r-[2rem] bg-surface-container shadow-[4px_0_16px_rgba(124,82,170,0.15)] z-20 flex-shrink-0 relative">
+<div class="p-6 flex flex-col items-center gap-2 mb-4">
+<div class="w-20 h-20 rounded-full bg-primary-container p-1 shadow-candy-primary">
+<img class="w-full h-full rounded-full object-cover" data-alt="A brightly lit, stylized 3D avatar of a friendly administrator with colorful vibrant accents on a light pink background, suitable for a playful joyful user interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDn_GPXAci6Ji18G9gz3DOI9rEHYKEGZDmIiOH1vnLZTRhJDoRNPF0q0ikWZCVpcze_WQpu1lL6bZudlp8Wb40r--yP4f3JXgtoBYsnRjmoyhQQed0WAky9B7AEYjSPxfwrYrGuPLYOEvkMWF0zn0c-lUKflf3fmEbpZsRNQN38IQTnLrxf42RAy9qOO5XBthhZHb5yKmSPL5zcFg8XlGVjXSJlX7T36VmzUJ6eVTO4neZmvC5qPOM7PA"/>
+</div>
+<h2 class="font-headline text-xl font-bold text-secondary text-center mt-2">Admin Panel</h2>
+<p class="text-sm text-on-surface-variant font-medium">dennerangeli@hotmail.com</p>
+</div>
+<div class="flex flex-col flex-grow p-4 gap-2 overflow-y-auto">
+<!-- Active Tab: Dashboard -->
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-full px-5 py-4 font-bold transition-all duration-300 ease-out shadow-candy-primary transform scale-105" href="#">
+<span class="material-symbols-outlined text-primary">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant px-5 py-4 hover:bg-surface-variant hover:text-secondary rounded-full transition-all duration-200 ease-out hover:scale-[1.03]" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-medium">User Growth</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant px-5 py-4 hover:bg-surface-variant hover:text-secondary rounded-full transition-all duration-200 ease-out hover:scale-[1.03]" href="#">
+<span class="material-symbols-outlined">brush</span>
+<span class="font-medium">Projects</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant px-5 py-4 hover:bg-surface-variant hover:text-secondary rounded-full transition-all duration-200 ease-out hover:scale-[1.03]" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-medium">Inventory</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant px-5 py-4 hover:bg-surface-variant hover:text-secondary rounded-full transition-all duration-200 ease-out hover:scale-[1.03]" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</div>
+<div class="p-4 mt-auto">
+<button class="w-full flex items-center justify-center gap-2 bg-primary text-on-primary font-bold py-4 rounded-full shadow-candy-primary hover-bounce">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">add</span>
+                Create Project
+            </button>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<main class="flex flex-col flex-grow w-full h-full relative overflow-hidden">
+<!-- TopAppBar (From JSON - acting as contextual header) -->
+<header class="flex justify-between items-center px-8 py-4 w-full bg-background/80 backdrop-blur-md z-10 sticky top-0">
+<div class="flex items-center gap-4">
+<!-- Mobile Menu Button -->
+<button class="md:hidden p-2 text-primary bg-primary-container rounded-full shadow-sm">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="text-2xl font-black text-primary tracking-tight font-headline">Balloon Admin</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-12 pr-4 py-3 bg-surface-container-highest border-none rounded-full w-64 focus:ring-2 focus:ring-primary text-on-surface placeholder-on-surface-variant font-medium transition-all" placeholder="Search profiles..." type="text"/>
+</div>
+<div class="flex gap-3">
+<button class="w-12 h-12 flex items-center justify-center bg-surface-container rounded-full text-secondary hover:bg-secondary-container hover:text-secondary-fixed transition-colors duration-200 shadow-sm relative hover-bounce">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-3 h-3 bg-primary rounded-full border-2 border-surface-container"></span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center bg-surface-container rounded-full text-secondary hover:bg-secondary-container hover:text-secondary-fixed transition-colors duration-200 shadow-sm hover-bounce">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Dashboard Canvas -->
+<div class="flex-grow overflow-y-auto p-6 md:p-8 pt-4 pb-24">
+<div class="max-w-7xl mx-auto space-y-8">
+<!-- Page Header -->
+<div>
+<h2 class="text-3xl font-extrabold text-on-surface font-headline">Welcome back! 👋</h2>
+<p class="text-on-surface-variant mt-1 text-lg font-medium">Here's what's happening in BalloonDesign today.</p>
+</div>
+<!-- Metrics Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Metric 1: Total Students -->
+<div class="bg-surface-container-lowest p-6 rounded-[2rem] shadow-candy-surface flex flex-col justify-between hover-bounce border-2 border-transparent hover:border-primary-fixed">
+<div class="flex justify-between items-start">
+<div class="w-14 h-14 rounded-full bg-primary-fixed flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-3xl">school</span>
+</div>
+<span class="bg-surface-container px-3 py-1 rounded-full text-xs font-bold text-on-surface-variant">+12%</span>
+</div>
+<div class="mt-6">
+<p class="text-on-surface-variant font-medium text-sm">Total Students</p>
+<p class="text-4xl font-black text-on-surface mt-1 tracking-tight">1,248</p>
+</div>
+</div>
+<!-- Metric 2: Pending Approvals -->
+<div class="bg-surface-container-lowest p-6 rounded-[2rem] shadow-candy-surface flex flex-col justify-between hover-bounce relative overflow-hidden group">
+<div class="absolute -right-6 -top-6 w-32 h-32 bg-secondary-fixed rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500 ease-out z-0"></div>
+<div class="relative z-10">
+<div class="flex justify-between items-start">
+<div class="w-14 h-14 rounded-full bg-secondary text-white flex items-center justify-center shadow-candy-secondary">
+<span class="material-symbols-outlined text-3xl">person_add</span>
+</div>
+<span class="bg-error-container text-on-error-container px-3 py-1 rounded-full text-xs font-bold animate-pulse">Action Required</span>
+</div>
+<div class="mt-6">
+<p class="text-on-surface-variant font-medium text-sm">Pending Approvals</p>
+<p class="text-4xl font-black text-on-surface mt-1 tracking-tight">24</p>
+</div>
+</div>
+</div>
+<!-- Metric 3: Projects Today -->
+<div class="bg-surface-container-lowest p-6 rounded-[2rem] shadow-candy-surface flex flex-col justify-between hover-bounce border-2 border-transparent hover:border-tertiary-fixed">
+<div class="flex justify-between items-start">
+<div class="w-14 h-14 rounded-full bg-tertiary-fixed flex items-center justify-center text-tertiary shadow-sm">
+<span class="material-symbols-outlined text-3xl">palette</span>
+</div>
+<span class="bg-tertiary text-white px-3 py-1 rounded-full text-xs font-bold shadow-candy-tertiary">Live</span>
+</div>
+<div class="mt-6">
+<p class="text-on-surface-variant font-medium text-sm">Projects Created Today</p>
+<p class="text-4xl font-black text-on-surface mt-1 tracking-tight">86</p>
+</div>
+</div>
+</div>
+<!-- Mid Section: Chart & System Status -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Growth Chart (Stylized representation for UI) -->
+<div class="lg:col-span-2 bg-surface-container-lowest p-6 rounded-[2rem] shadow-candy-surface flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl font-bold text-on-surface font-headline">Weekly User Growth</h3>
+<button class="text-primary font-bold text-sm bg-primary-fixed px-4 py-2 rounded-full hover:bg-primary-container transition-colors">Details</button>
+</div>
+<!-- Playful Bar Chart Visualization using Tailwind -->
+<div class="flex-grow flex items-end gap-2 md:gap-4 h-48 mt-4 pt-4 border-b-2 border-surface-variant pb-2 relative">
+<!-- Y-axis labels -->
+<div class="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-xs text-outline font-medium py-2 -ml-2">
+<span>100</span>
+<span>50</span>
+<span>0</span>
+</div>
+<div class="w-full flex justify-around items-end h-full pl-6">
+<div class="w-1/6 bg-tertiary-fixed rounded-t-xl h-[40%] hover:bg-tertiary transition-colors duration-300 relative group cursor-pointer">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface shadow-md px-2 py-1 rounded text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">42</div>
+</div>
+<div class="w-1/6 bg-secondary-fixed rounded-t-xl h-[65%] hover:bg-secondary transition-colors duration-300 relative group cursor-pointer">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface shadow-md px-2 py-1 rounded text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">68</div>
+</div>
+<div class="w-1/6 bg-primary-container rounded-t-xl h-[55%] hover:bg-primary transition-colors duration-300 relative group cursor-pointer">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface shadow-md px-2 py-1 rounded text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">55</div>
+</div>
+<div class="w-1/6 bg-secondary rounded-t-xl h-[80%] hover:bg-on-secondary-container transition-colors duration-300 shadow-candy-secondary relative group cursor-pointer">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface shadow-md px-2 py-1 rounded text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">84</div>
+</div>
+<div class="w-1/6 bg-primary rounded-t-xl h-[95%] hover:bg-on-primary-fixed-variant transition-colors duration-300 shadow-candy-primary relative group cursor-pointer">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface shadow-md px-2 py-1 rounded text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">98</div>
+</div>
+</div>
+</div>
+<div class="flex justify-around pl-6 mt-3 text-sm font-medium text-on-surface-variant">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span>
+</div>
+</div>
+<!-- System Status Bento -->
+<div class="bg-surface-container-lowest p-6 rounded-[2rem] shadow-candy-surface flex flex-col justify-between">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined">dns</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface font-headline">System Status</h3>
+</div>
+<div class="space-y-4">
+<!-- Vercel Status -->
+<div class="bg-surface-container rounded-[1.5rem] p-4 flex items-center justify-between hover-bounce">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center border border-surface-variant">
+<svg class="w-5 h-5 text-black" fill="currentColor" viewbox="0 0 24 24"><path d="M24 22.525H0l12-21.05 12 21.05z"></path></svg>
+</div>
+<div>
+<p class="font-bold text-on-surface text-sm">Vercel Edge</p>
+<p class="text-xs text-outline font-medium">Production</p>
+</div>
+</div>
+<div class="flex items-center gap-2 bg-[#e6f4ea] text-[#137333] px-3 py-1.5 rounded-full text-xs font-bold">
+<div class="w-2 h-2 rounded-full bg-[#137333] animate-pulse"></div>
+                                    Online
+                                </div>
+</div>
+<!-- Supabase Status -->
+<div class="bg-surface-container rounded-[1.5rem] p-4 flex items-center justify-between hover-bounce">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-[#1c1c1c] shadow-sm flex items-center justify-center border border-surface-variant">
+<svg class="w-6 h-6 text-[#3ecf8e]" fill="currentColor" viewbox="0 0 24 24"><path d="M21.362 9.354H12V.396a.396.396 0 0 0-.716-.233L2.203 12.424l-.014.019a.461.461 0 0 0 .365.738h9.366v8.96c0 .324.354.518.625.342l.061-.045 9.08-12.261a.461.461 0 0 0-.324-.823z"></path></svg>
+</div>
+<div>
+<p class="font-bold text-on-surface text-sm">Supabase DB</p>
+<p class="text-xs text-outline font-medium">eu-central-1</p>
+</div>
+</div>
+<div class="flex items-center gap-2 bg-[#e6f4ea] text-[#137333] px-3 py-1.5 rounded-full text-xs font-bold">
+<div class="w-2 h-2 rounded-full bg-[#137333] animate-pulse"></div>
+                                    Connected
+                                </div>
+</div>
+</div>
+</div>
+</div>
+<!-- New Enrollees List (Supabase Profiles) -->
+<div class="bg-surface-container-lowest rounded-[2.5rem] shadow-candy-surface overflow-hidden border border-surface-variant/50">
+<div class="p-6 md:p-8 border-b border-surface-variant flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-surface-container-lowest to-surface-bright">
+<div>
+<h3 class="text-2xl font-extrabold text-on-surface font-headline">New Enrollees</h3>
+<p class="text-on-surface-variant text-sm font-medium mt-1">Review pending registrations from the 'profiles' table.</p>
+</div>
+<button class="flex items-center gap-2 text-secondary font-bold hover:text-primary transition-colors bg-secondary-fixed px-4 py-2 rounded-full shadow-sm hover-bounce">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                            Filter
+                        </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container text-on-surface-variant text-sm font-bold border-b border-surface-variant">
+<th class="py-4 px-6 font-headline">User Profile</th>
+<th class="py-4 px-6 font-headline">Email Address</th>
+<th class="py-4 px-6 font-headline">Registration Date</th>
+<th class="py-4 px-6 text-right font-headline">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-surface transition-colors group">
+<td class="py-4 px-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-fixed overflow-hidden border-2 border-surface">
+<img class="w-full h-full object-cover" data-alt="A brightly colored portrait of a young woman with pink glasses, matching the playful light candy UI aesthetic, high quality 3d render style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMZ8S8aY9cIfJhGDftYmU93J6kPMAIWYPot9b_23oeLJ_Npj89MERPtsltoZKcb0ojyl-4PBYHU62dZdVVOnF-5ik84bEgL-bLvwyq-2A5CnjzS8rautw2jU_V2KdHRy_qs9UNmwKVW08KFfMdVuAWTSiqkDj4XUty0HzA34oEnraxs-4YaR4u64v1DBcb0RzbVI2mFK8ULhFhza2y4a5ZGA-enFhPOSM8w3aRBCpXI6yg3LANLZmjBg"/>
+</div>
+<span class="font-bold text-on-surface">Marina Silva</span>
+</div>
+</td>
+<td class="py-4 px-6 text-on-surface-variant font-medium">marina.silva@example.com</td>
+<td class="py-4 px-6 text-on-surface-variant font-medium">Today, 09:24 AM</td>
+<td class="py-4 px-6 text-right">
+<div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+<button class="w-10 h-10 rounded-full bg-error-container text-error flex items-center justify-center hover:bg-error hover:text-white transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+<button class="px-5 py-2 rounded-full bg-primary text-white font-bold hover:bg-on-primary-fixed-variant transition-colors shadow-candy-primary">
+                                                Approve
+                                            </button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface transition-colors group">
+<td class="py-4 px-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed overflow-hidden border-2 border-surface">
+<img class="w-full h-full object-cover" data-alt="A stylized 3d render of a young man with a purple cap, friendly expression, vibrant lighting fitting a joyful playful design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAi4X3JSsV88TKvn5DPubZ2G6Gre2JgnrS8uV6ck30cApU4ZgQ0oAkatp9GCVfow17RRU0qAWisT5SfYvpQ_VXpo-tkfxLCgnqOrTS1rVYaAWkscd6EuzPeNazdm-euSH6rORjlVn5t7a5QV468Or8w9_oAquoQt8VG_iazrixs0zOEEdVjevwIy6xfCGSlpxZvOZB2GHvK-_bjToUIABcj3Y09yv9XiPsAQqBaPHP67rjheI9n00pVYQ"/>
+</div>
+<span class="font-bold text-on-surface">Lucas Costa</span>
+</div>
+</td>
+<td class="py-4 px-6 text-on-surface-variant font-medium">lucas.costa@example.com</td>
+<td class="py-4 px-6 text-on-surface-variant font-medium">Yesterday, 14:10 PM</td>
+<td class="py-4 px-6 text-right">
+<div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+<button class="w-10 h-10 rounded-full bg-error-container text-error flex items-center justify-center hover:bg-error hover:text-white transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+<button class="px-5 py-2 rounded-full bg-primary text-white font-bold hover:bg-on-primary-fixed-variant transition-colors shadow-candy-primary">
+                                                Approve
+                                            </button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface transition-colors group">
+<td class="py-4 px-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed overflow-hidden border-2 border-surface">
+<img class="w-full h-full object-cover" data-alt="A bright colorful 3d avatar of a person with blue headphones, smiling gently, against a light pastel background, highly joyful aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8zpST0L0iujJ58JKJdJlNlRWKF3x76eMm6L0ylvxdLCS8xjFex5a0UQVcnywYvceDKPNaiYR2TeZ8jKQvZF0fAdI0RHlJGfxfDMiceBHOPD-akx9EBPVG_Bp9mz1N_ipIx7XJ4p37AdtR7IoUcEx6whsRqKlsa4xEG_yrSf7X6r9qc-qPY64B8W9ibH6WyV-4mQ_-gm2RCSaN3YoiAVQO9vGFDCaNfbvnJNqIjBXSK3EAxbSybYeEKQ"/>
+</div>
+<span class="font-bold text-on-surface">Ana Paula</span>
+</div>
+</td>
+<td class="py-4 px-6 text-on-surface-variant font-medium">ana.paula@example.com</td>
+<td class="py-4 px-6 text-on-surface-variant font-medium">Oct 24, 11:05 AM</td>
+<td class="py-4 px-6 text-right">
+<div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+<button class="w-10 h-10 rounded-full bg-error-container text-error flex items-center justify-center hover:bg-error hover:text-white transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+<button class="px-5 py-2 rounded-full bg-primary text-white font-bold hover:bg-on-primary-fixed-variant transition-colors shadow-candy-primary">
+                                                Approve
+                                            </button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-surface-variant flex justify-center bg-surface-container-low">
+<button class="text-secondary font-bold hover:text-primary transition-colors py-2 px-6 rounded-full hover:bg-secondary-fixed">View All Profiles</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
