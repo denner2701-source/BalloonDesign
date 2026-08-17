@@ -1,0 +1,104 @@
+.profile:hover {
+  border-radius: 12px;
+  background: #f7f4ff;
+}
+
+.profile > span:nth-child(2) {
+  min-width: 0;
+}
+
+.profile b,
+.profile small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auth-card {
+  display: grid;
+  width: min(440px, calc(100vw - 32px));
+  gap: 14px;
+}
+
+.auth-card > p.muted {
+  margin: -14px 0 4px;
+  line-height: 1.5;
+}
+
+.auth-card label {
+  display: grid;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.auth-card input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  font: inherit;
+  outline: none;
+}
+
+.auth-card input:focus {
+  border-color: var(--violet);
+  box-shadow: 0 0 0 3px #6d3df51a;
+}
+
+#auth-fields,
+#auth-account {
+  display: grid;
+  gap: 13px;
+}
+
+.profile-fields {
+  display: grid;
+  gap: 10px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.profile-fields small {
+  margin-top: -5px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.account-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border-radius: 13px;
+  background: #f7f4ff;
+}
+
+.account-summary div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.account-summary b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-summary small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.auth-message {
+  min-height: 19px;
+  margin: 0;
+  color: #26734d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.auth-message.error {
+  color: #b42318;
+}

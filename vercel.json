@@ -1,0 +1,28 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/admin.html", "destination": "/", "permanent": true },
+    { "source": "/editor-3d.html", "destination": "/", "permanent": true },
+    { "source": "/editor-mosaico.html", "destination": "/", "permanent": true },
+    { "source": "/login.html", "destination": "/", "permanent": true },
+    { "source": "/orcamento.html", "destination": "/", "permanent": true },
+    { "source": "/projetos.html", "destination": "/", "permanent": true },
+    { "source": "/recuperar-senha.html", "destination": "/", "permanent": true },
+    { "source": "/planos.html", "destination": "/", "permanent": true },
+    { "source": "/configuracoes.html", "destination": "/", "permanent": true }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://ryffqldqedovhfedugyf.supabase.co wss://ryffqldqedovhfedugyf.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=()" }
+      ]
+    }
+  ]
+}
