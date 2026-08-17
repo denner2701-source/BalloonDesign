@@ -140,6 +140,7 @@
       toast('Salvo neste dispositivo. A sincronização será tentada novamente.');
     }
   };
+  $('#save-project').onclick = () => void saveProject();
 
   async function applySession(nextSession) {
     const changedUser = session?.user?.id !== nextSession?.user?.id;

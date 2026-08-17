@@ -272,6 +272,7 @@ function saveProject(){
   const next=projects.filter(project=>project.id!==state.id);
   next.unshift(structuredClone(state));
   writeProjects(next);persistDraft();renderProjectList();
+  if(conflict)renderAll();
   toast(conflict?'Outra aba salvou uma versão mais recente. Seu trabalho foi preservado como cópia.':'Projeto salvo com sucesso.');
   return {conflict,project:structuredClone(state)};
 }
