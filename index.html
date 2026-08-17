@@ -59,7 +59,7 @@
                   <button class="tool" data-tool="pan" title="Mover a área de trabalho">✋ <span>Mover</span></button>
                   <button class="tool" id="import-image" title="Pintar a partir de uma imagem">▧ <span>Imagem</span></button><input id="image-input" type="file" accept="image/*" aria-label="Selecionar imagem para converter em balões" hidden />
                 </div>
-                <div class="tool-group advanced-tools"><label class="tool-select">Tamanho <select id="balloon-size"><option value="5">5&quot;</option><option value="9" selected>9&quot;</option><option value="11">11&quot;</option><option value="16">16&quot;</option></select></label><button class="tool" id="mirror-horizontal" title="Espelhar na horizontal">⇆ <span>Espelhar</span></button><button class="tool" id="mirror-vertical" title="Espelhar na vertical">⇅</button></div>
+                <div class="tool-group advanced-tools"><label class="tool-select">Tamanho <select id="balloon-size"><option value="5">5&quot;</option><option value="9" selected>9&quot;</option><option value="11">11&quot;</option><option value="16">16&quot;</option></select></label><button class="tool" id="mirror-horizontal" title="Espelhar na horizontal">⇆ <span>Espelhar</span></button><button class="tool" id="mirror-vertical" title="Espelhar na vertical">⇅</button><button class="tool" id="trim-empty" title="Aparar linhas e colunas vazias">⌗ <span>Aparar</span></button><button class="tool" id="center-design" title="Centralizar o desenho na grade">⊙ <span>Centralizar</span></button><button class="tool" id="toggle-empty" aria-pressed="false" title="Ocultar posições vazias">◌ <span>Ocultar vazios</span></button></div>
                 <div class="tool-group history-group"><button class="tool" id="undo" title="Desfazer (Ctrl+Z)">↶</button><button class="tool" id="redo" title="Refazer (Ctrl+Y)">↷</button><i></i><button class="tool" id="zoom-out" title="Diminuir zoom">−</button><output id="zoom-value">100%</output><button class="tool" id="zoom-in" title="Aumentar zoom">+</button></div>
               </div>
               <div class="canvas-wrap" id="canvas-wrap"><canvas id="design-canvas" width="960" height="640" role="application" tabindex="0" aria-label="Grade de balões editável" aria-describedby="canvas-hint" aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Enter Space Delete Backspace"></canvas></div>
@@ -165,11 +165,11 @@
     <script src="vendor.js"></script>
     <script src="supabase-config.js"></script>
     <script src="calculation-core.js"></script>
-    <script src="app.js"></script>
+    <script src="app.js?v=4"></script>
     <script src="budget.js"></script>
     <script src="calculator.js"></script>
-    <script src="cloud.js"></script>
-    <script src="gallery.js"></script>
+    <script src="cloud.js?v=2"></script>
+    <script src="gallery.js?v=2"></script>
     <script src="settings.js"></script>
     <script src="three-preview.js"></script>
   </body>

@@ -84,6 +84,7 @@
       checklist: row.checklist || [],
       zoom: 1,
       rotation: -12,
+      ownerId: row.user_id,
       updatedAt: new Date(row.updated_at).getTime()
     };
   }
@@ -98,10 +99,17 @@
     if (!session || syncing) return;
     syncing = true;
     try {
-      const projects = projectStore();
+      const activeProjects = projectStore();
+      const guestProjects = window.balloonWorkspace?.guestProjects?.() || [];
+      const guestDraft = window.balloonWorkspace?.guestDraft?.();
+      const meaningfulGuestDraft = guestDraft?.id && (guestDraft.updatedAt || guestDraft.name !== 'Novo projeto' || guestDraft.cells?.some(Boolean) || Object.keys(guestDraft.budget || {}).length || guestDraft.checklist?.some(item => item.done));
+      const projectsById = new Map([...activeProjects, ...guestProjects, ...(meaningfulGuestDraft ? [guestDraft] : [])].map(project => [project.id, project]));
+      const projects = [...projectsById.values()].map(project => ({ ...project, ownerId: session.user.id, updatedAt: project.updatedAt || Date.now() }));
       if (projects.length) {
         const { error } = await cloud.from('projects').upsert(projects.map(cloudRow), { onConflict: 'id' });
         if (error) throw error;
+        window.balloonWorkspace?.writeActive?.(projects);
+        window.balloonWorkspace?.clearGuest?.();
       }
     } finally {
       syncing = false;
@@ -117,7 +125,7 @@
       const current = merged.get(project.id);
       if (!current || project.updatedAt >= (current.updatedAt || 0)) merged.set(project.id, project);
     });
-    localStorage.setItem(storageKey, JSON.stringify([...merged.values()].sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))));
+    window.balloonWorkspace?.writeActive?.([...merged.values()].sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)));
     localRenderProjectList();
   }
 
@@ -140,6 +148,7 @@
     if (!session) {
       publicProfile = null;
       window.balloonProfile = null;
+      window.balloonWorkspace?.activate?.();
     }
     updateAccountUi();
     if (!session) {
@@ -149,9 +158,11 @@
     try {
       await loadPublicProfile();
       if (changedUser) {
+        window.balloonWorkspace?.activate?.();
         setMessage('Sincronizando seus projetos…');
         await syncLocalProjects();
         await loadCloudProjects();
+        window.balloonWorkspace?.activate?.();
         setMessage('Conta conectada e projetos sincronizados.');
         toast('Conta conectada. Projetos sincronizados.');
       }

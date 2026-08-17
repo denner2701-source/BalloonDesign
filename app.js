@@ -4,6 +4,7 @@ const canvas = $('#design-canvas');
 const ctx = canvas.getContext('2d');
 const guideCanvas = $('#guide-canvas');
 const storageKey = 'balloon-design-projects-v1';
+const draftStorageKey = 'balloon-design-draft';
 const balloonSizeCosts = { 5: .55, 9: .88, 11: 1.15, 16: 2.40 };
 const { slugify, balloonLabel } = window.BalloonCalculations;
 const checklistDefaults = [
@@ -20,7 +21,8 @@ const paletteDefaults = [
   { name: 'Pêssego', hex: '#fbad8f' }, { name: 'Manteiga', hex: '#f8da72' },
   { name: 'Menta', hex: '#62d8b0' }, { name: 'Azul céu', hex: '#75bff4' },
 ];
-let state = { id: crypto.randomUUID(), name: 'Novo projeto', shape: 'panel_duplet', cols: 12, rows: 8, palette: paletteDefaults, selected: '#8b5cf6', selectedSize: 9, cells: [], balloonSizes: [], checklist: [], zoom: 1, rotation: -12 };
+function blankProject() { return { id: crypto.randomUUID(), name: 'Novo projeto', shape: 'panel_duplet', cols: 12, rows: 8, palette: structuredClone(paletteDefaults), selected: '#8b5cf6', selectedSize: 9, cells: [], balloonSizes: [], checklist: [], zoom: 1, rotation: -12, hideEmpty: false, updatedAt: 0 }; }
+let state = blankProject();
 let tool = 'pencil';
 let undoStack = [], redoStack = [];
 
@@ -42,6 +44,7 @@ function ensureCells() {
     state.balloonSizes = Array.from({ length: state.cols * state.rows }, (_, index) => state.cells[index] ? 9 : null);
   }
   state.selectedSize = Number(state.selectedSize) || 9;
+  state.hideEmpty = Boolean(state.hideEmpty);
 }
 function ensureChecklist() {
   if (!Array.isArray(state.checklist) || !state.checklist.length) {
@@ -93,6 +96,7 @@ function renderCanvas(target = canvas, guide = false) {
     const organicScale = state.shape === 'organic' ? [.72, 1, 1.28, .86][(row * 3 + col) % 4] : 1;
     const cylinderDepth = state.shape === 'duplet_alternating' ? .76 + Math.sin((col + .5) / state.cols * Math.PI) * .24 : 1;
     const rowOffset = state.shape === 'panel_duplet' && row % 2 ? size * .28 : 0;
+    if (!state.cells[index] && state.hideEmpty && !guide) continue;
     drawBalloon(c, startX+col*size+rowOffset, startY+row*size, size*.40*sizeScale*alternatingScale*organicScale*cylinderDepth, state.cells[index], !state.cells[index]);
   }
   if (!guide) { c.fillStyle='#776f8d'; c.font='600 15px DM Sans'; c.fillText(`${state.cols} × ${state.rows} · ${shapeLabel()}`, 32, height-26); }
@@ -132,8 +136,19 @@ function renderChecklist() {
   $('#checklist-progress').textContent = `${completed}/${state.checklist.length}`;
   $('#guide-checklist').innerHTML = state.checklist.map(item => `<label class="checklist-row ${item.done ? 'done' : ''}"><input type="checkbox" data-checklist-id="${item.id}" ${item.done ? 'checked' : ''} /><span>${escapeHtml(item.label)}</span></label>`).join('');
 }
-function renderAll() { ensureCells(); ensureChecklist(); $('#project-title').textContent=state.name; $('#project-breadcrumb').textContent=state.name; $('#project-subtitle').textContent=`${shapeLabel()} de balões · ${state.cols} × ${state.rows}`; $('#shape-select').value=state.shape; const gridValue=`${state.cols}x${state.rows}`; $('#grid-select').value=[...$('#grid-select').options].some(option=>option.value===gridValue)?gridValue:'custom'; $('#balloon-size').value=String(state.selectedSize); canvas.style.transform='none'; canvas.style.maxWidth='none'; canvas.style.maxHeight='none'; canvas.style.width=`${Math.round(state.zoom*94)}%`; canvas.style.height='auto'; $('#zoom-value').textContent=`${Math.round(state.zoom*100)}%`; renderCanvas(); renderCanvas(guideCanvas,true); renderPalette(); renderPreview(); renderMaterials(); renderChecklist(); updateCanvasAccessibility(); persistDraft(); }
-function persistDraft(){ localStorage.setItem('balloon-design-draft',JSON.stringify(state)); }
+function renderAll() { ensureCells(); ensureChecklist(); $('#project-title').textContent=state.name; $('#project-breadcrumb').textContent=state.name; $('#project-subtitle').textContent=`${shapeLabel()} de balões · ${state.cols} × ${state.rows}`; $('#shape-select').value=state.shape; const gridValue=`${state.cols}x${state.rows}`; $('#grid-select').value=[...$('#grid-select').options].some(option=>option.value===gridValue)?gridValue:'custom'; $('#balloon-size').value=String(state.selectedSize); const emptyToggle=$('#toggle-empty'); emptyToggle.setAttribute('aria-pressed',String(state.hideEmpty)); emptyToggle.classList.toggle('active',state.hideEmpty); emptyToggle.querySelector('span').textContent=state.hideEmpty?'Mostrar vazios':'Ocultar vazios'; canvas.style.transform='none'; canvas.style.maxWidth='none'; canvas.style.maxHeight='none'; canvas.style.width=`${Math.round(state.zoom*94)}%`; canvas.style.height='auto'; $('#zoom-value').textContent=`${Math.round(state.zoom*100)}%`; renderCanvas(); renderCanvas(guideCanvas,true); renderPalette(); renderPreview(); renderMaterials(); renderChecklist(); updateCanvasAccessibility(); persistDraft(); }
+function workspaceSuffix() { return window.balloonSession?.user?.id || 'guest'; }
+function activeProjectStorageKey() { return `${storageKey}:${workspaceSuffix()}`; }
+function activeDraftStorageKey() { return `${draftStorageKey}:${workspaceSuffix()}`; }
+function readProjects(key = activeProjectStorageKey()) { try { const value=JSON.parse(localStorage.getItem(key)); return Array.isArray(value)?value:[]; } catch { return []; } }
+function writeProjects(projects, key = activeProjectStorageKey()) { localStorage.setItem(key,JSON.stringify(projects)); }
+function migrateLegacyWorkspace(){
+  if(workspaceSuffix()!=='guest')return;
+  const projectKey=activeProjectStorageKey(),draftKey=activeDraftStorageKey();
+  if(!localStorage.getItem(projectKey)&&localStorage.getItem(storageKey)){localStorage.setItem(projectKey,localStorage.getItem(storageKey));localStorage.removeItem(storageKey);}
+  if(!localStorage.getItem(draftKey)&&localStorage.getItem(draftStorageKey)){localStorage.setItem(draftKey,localStorage.getItem(draftStorageKey));localStorage.removeItem(draftStorageKey);}
+}
+function persistDraft(){ localStorage.setItem(activeDraftStorageKey(),JSON.stringify(state)); }
 function toast(message){ const el=$('#toast'); el.textContent=message; el.classList.add('show'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.classList.remove('show'),2500); }
 function canvasPosition(event) { const r=canvas.getBoundingClientRect(); return { x:(event.clientX-r.left)/r.width*canvas.width, y:(event.clientY-r.top)/r.height*canvas.height }; }
 function cellAt(event){ const {x,y}=canvasPosition(event), margin=68, size=Math.min((canvas.width-margin*2)/state.cols,(canvas.height-margin*2)/state.rows), startX=(canvas.width-size*state.cols)/2, startY=(canvas.height-size*state.rows)/2; const col=Math.floor((x-startX)/size),row=Math.floor((y-startY)/size); return col<0||row<0||col>=state.cols||row>=state.rows||!shapeVisible(col,row)?null:row*state.cols+col; }
@@ -171,6 +186,7 @@ canvas.addEventListener('keydown',event=>{
   renderAll();
 });
 canvas.addEventListener('pointerdown',event=>{
+  if(event.button===1){event.preventDefault();const index=cellAt(event);const color=index===null?null:state.cells[index];if(color){state.selected=color;state.selectedSize=Number(state.balloonSizes[index]||9);renderAll();toast(`Cor ${colorName(color)} e tamanho ${state.selectedSize} polegadas selecionados.`);}return;}
   if(tool==='pan'){panStart={x:event.clientX,y:event.clientY,left:$('#canvas-wrap').scrollLeft,top:$('#canvas-wrap').scrollTop};canvas.setPointerCapture(event.pointerId);return;}
   if(tool==='fill'){commit();if(applyToolAt(event))renderAll();return;}
   drawing=true;drawingChanged=false;canvas.setPointerCapture(event.pointerId);commit();if(applyToolAt(event)){drawingChanged=true;renderCanvas();}
@@ -202,6 +218,33 @@ function mirrorDesign(axis) {
 }
 $('#mirror-horizontal').onclick=()=>mirrorDesign('horizontal');
 $('#mirror-vertical').onclick=()=>mirrorDesign('vertical');
+function paintedBounds(){
+  const painted=state.cells.map((color,index)=>color?index:null).filter(index=>index!==null);
+  if(!painted.length)return null;
+  const rows=painted.map(index=>Math.floor(index/state.cols)),cols=painted.map(index=>index%state.cols);
+  return {minRow:Math.min(...rows),maxRow:Math.max(...rows),minCol:Math.min(...cols),maxCol:Math.max(...cols)};
+}
+$('#trim-empty').onclick=()=>{
+  const bounds=paintedBounds();if(!bounds){toast('Pinte ao menos um balão antes de aparar.');return;}
+  const nextCols=bounds.maxCol-bounds.minCol+1,nextRows=bounds.maxRow-bounds.minRow+1;
+  if(nextCols===state.cols&&nextRows===state.rows){toast('Não há bordas vazias para aparar.');return;}
+  commit();const nextCells=blankCells(nextCols,nextRows),nextSizes=blankSizes(nextCols,nextRows);
+  for(let row=bounds.minRow;row<=bounds.maxRow;row++)for(let col=bounds.minCol;col<=bounds.maxCol;col++){
+    const source=row*state.cols+col,target=(row-bounds.minRow)*nextCols+(col-bounds.minCol);nextCells[target]=state.cells[source];nextSizes[target]=state.balloonSizes[source];
+  }
+  state.cols=nextCols;state.rows=nextRows;state.cells=nextCells;state.balloonSizes=nextSizes;renderAll();toast(`Bordas aparadas para ${nextCols} × ${nextRows}.`);
+};
+$('#center-design').onclick=()=>{
+  const bounds=paintedBounds();if(!bounds){toast('Pinte ao menos um balão antes de centralizar.');return;}
+  const width=bounds.maxCol-bounds.minCol+1,height=bounds.maxRow-bounds.minRow+1;
+  const targetCol=Math.floor((state.cols-width)/2),targetRow=Math.floor((state.rows-height)/2);
+  const deltaCol=targetCol-bounds.minCol,deltaRow=targetRow-bounds.minRow;
+  if(!deltaCol&&!deltaRow){toast('O desenho já está centralizado.');return;}
+  commit();const nextCells=blankCells(),nextSizes=blankSizes();
+  state.cells.forEach((color,index)=>{if(!color)return;const row=Math.floor(index/state.cols)+deltaRow,col=index%state.cols+deltaCol;if(row<0||col<0||row>=state.rows||col>=state.cols||!shapeVisible(col,row))return;const target=row*state.cols+col;nextCells[target]=color;nextSizes[target]=state.balloonSizes[index];});
+  state.cells=nextCells;state.balloonSizes=nextSizes;renderAll();toast('Desenho centralizado na grade.');
+};
+$('#toggle-empty').onclick=()=>{state.hideEmpty=!state.hideEmpty;renderAll();toast(state.hideEmpty?'Posições vazias ocultadas.':'Posições vazias exibidas.');};
 $('#import-image').onclick=()=>$('#image-input').click();
 $('#image-input').onchange=event=>{const file=event.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{const image=new Image();image.onload=()=>{commit();const sample=document.createElement('canvas');sample.width=state.cols;sample.height=state.rows;const sampleCtx=sample.getContext('2d',{willReadFrequently:true});sampleCtx.drawImage(image,0,0,state.cols,state.rows);const pixels=sampleCtx.getImageData(0,0,state.cols,state.rows).data;for(let row=0;row<state.rows;row++)for(let col=0;col<state.cols;col++){if(!shapeVisible(col,row))continue;const index=row*state.cols+col;const pos=index*4;const [r,g,b,a]=pixels.slice(pos,pos+4);if(a<45){state.cells[index]=null;state.balloonSizes[index]=null;continue;}let nearest=state.palette[0];let distance=Infinity;state.palette.forEach(color=>{const rgb=color.hex.match(/\w\w/g).map(value=>parseInt(value,16));const value=(r-rgb[0])**2+(g-rgb[1])**2+(b-rgb[2])**2;if(value<distance){distance=value;nearest=color;}});state.cells[index]=nearest.hex;state.balloonSizes[index]=state.selectedSize;}renderAll();toast('Imagem convertida para a paleta do projeto.');};image.src=reader.result;};reader.readAsDataURL(file);event.target.value='';};
 $('#rotation').oninput=e=>{state.rotation=e.target.value;renderPreview();persistDraft()};
@@ -216,8 +259,22 @@ $('#grid-select').onchange=e=>{
   }
   commit();const [cols,rows]=value.split('x').map(Number);state.cols=cols;state.rows=rows;state.cells=blankCells();state.balloonSizes=blankSizes();renderAll();toast('Grade atualizada — o desenho foi reiniciado.');
 };
-function projectStore(){try{return JSON.parse(localStorage.getItem(storageKey))||[]}catch{return[]}}
-function saveProject(){const projects=projectStore().filter(p=>p.id!==state.id);projects.unshift({...state,updatedAt:Date.now()});localStorage.setItem(storageKey,JSON.stringify(projects));persistDraft();toast('Projeto salvo com sucesso.');renderProjectList();}
+function projectStore(){return readProjects()}
+function saveProject(){
+  const projects=projectStore(), existing=projects.find(project=>project.id===state.id);
+  let conflict=false;
+  if(existing&&state.updatedAt&&Number(existing.updatedAt)>Number(state.updatedAt)){
+    conflict=true;
+    state={...structuredClone(state),id:crypto.randomUUID(),name:`${state.name} (conflito preservado)`};
+  }
+  state.updatedAt=Date.now();
+  if(window.balloonSession?.user?.id)state.ownerId=window.balloonSession.user.id;
+  const next=projects.filter(project=>project.id!==state.id);
+  next.unshift(structuredClone(state));
+  writeProjects(next);persistDraft();renderProjectList();
+  toast(conflict?'Outra aba salvou uma versão mais recente. Seu trabalho foi preservado como cópia.':'Projeto salvo com sucesso.');
+  return {conflict,project:structuredClone(state)};
+}
 $('#save-project').onclick=saveProject;
 function miniProject(canvasEl,project){const backup=state;state=project;renderCanvas(canvasEl,true);state=backup;}
 function filteredProjects(){
@@ -230,7 +287,7 @@ function filteredProjects(){
 }
 function renderProjectList(){const projects=filteredProjects();if($('#project-results'))$('#project-results').textContent=`${projects.length} ${projects.length===1?'projeto':'projetos'}`;$('#project-list').innerHTML=projects.length?projects.map(p=>`<article class="project-card"><div class="project-thumb"><canvas width="300" height="170" data-id="${p.id}"></canvas></div><div class="project-card-body"><h3>${escapeHtml(p.name)}</h3><p>${shapeLabel(p.shape)} · ${p.cols} × ${p.rows} · ${balloonLabel(p.cells.filter(Boolean).length)}</p><div class="project-card-actions"><button data-open="${p.id}">Abrir</button><button data-duplicate="${p.id}">Duplicar</button><button data-export="${p.id}">Exportar</button><button class="danger-action" data-delete="${p.id}">Excluir</button></div></div></article>`).join(''):'<div class="empty-state"><b>Nenhum projeto encontrado</b><p>Ajuste os filtros ou crie um projeto novo.</p></div>';projects.forEach(p=>{const el=$(`#project-list canvas[data-id="${p.id}"]`);if(el)miniProject(el,p)});}
 function escapeHtml(value){return value.replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));}
-$('#project-list').onclick=e=>{const id=e.target.dataset.open||e.target.dataset.duplicate||e.target.dataset.export||e.target.dataset.delete;if(!id)return;const project=projectStore().find(p=>p.id===id);if(!project)return;if(e.target.dataset.duplicate){state={...structuredClone(project),id:crypto.randomUUID(),name:`Cópia de ${project.name}`};void saveProject();}else if(e.target.dataset.export){const link=document.createElement('a');link.download=`${slugify(project.name)}.balloondesign.json`;link.href=URL.createObjectURL(new Blob([JSON.stringify(project,null,2)],{type:'application/json'}));link.click();URL.revokeObjectURL(link.href);toast('Arquivo do projeto exportado.');}else if(e.target.dataset.delete){if(!confirm(`Excluir “${project.name}”? Esta ação remove o projeto salvo.`))return;localStorage.setItem(storageKey,JSON.stringify(projectStore().filter(item=>item.id!==id)));window.dispatchEvent(new CustomEvent('balloon-project-delete',{detail:{id}}));renderProjectList();toast('Projeto excluído.');}else{state=structuredClone(project);undoStack=[];redoStack=[];renderAll();activateView('studio');} };
+$('#project-list').onclick=e=>{const id=e.target.dataset.open||e.target.dataset.duplicate||e.target.dataset.export||e.target.dataset.delete;if(!id)return;const project=projectStore().find(p=>p.id===id);if(!project)return;if(e.target.dataset.duplicate){state={...structuredClone(project),id:crypto.randomUUID(),name:`Cópia de ${project.name}`,updatedAt:0};void saveProject();}else if(e.target.dataset.export){const link=document.createElement('a');link.download=`${slugify(project.name)}.balloondesign.json`;link.href=URL.createObjectURL(new Blob([JSON.stringify(project,null,2)],{type:'application/json'}));link.click();URL.revokeObjectURL(link.href);toast('Arquivo do projeto exportado.');}else if(e.target.dataset.delete){if(!confirm(`Excluir “${project.name}”? Esta ação remove o projeto salvo.`))return;writeProjects(projectStore().filter(item=>item.id!==id));window.dispatchEvent(new CustomEvent('balloon-project-delete',{detail:{id}}));renderProjectList();toast('Projeto excluído.');}else{state=structuredClone(project);undoStack=[];redoStack=[];renderAll();activateView('studio');} };
 ['#project-search','#project-type-filter','#project-sort'].forEach(selector=>$(selector)?.addEventListener('input',renderProjectList));
 function activateView(view){$$('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.view===view));$$('.view').forEach(x=>x.classList.toggle('active',x.id===`${view}-view`));if(view==='guide')renderAll();if(view==='projects')renderProjectList();$('.sidebar').classList.remove('open');}
 $$('.nav-link').forEach(button=>button.onclick=()=>activateView(button.dataset.view));
@@ -242,4 +299,23 @@ $('#print-guide').onclick=()=>window.print();
 $('#mobile-menu').onclick=()=>$('.sidebar').classList.toggle('open');
 $('#guide-checklist').addEventListener('change',event=>{const id=event.target.dataset.checklistId;if(!id)return;ensureChecklist();const item=state.checklist.find(entry=>entry.id===id);if(item){item.done=event.target.checked;renderChecklist();persistDraft();}});
 window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo()}});
-try{const saved=JSON.parse(localStorage.getItem('balloon-design-draft'));if(saved)state={...state,...saved};}catch{}ensureCells();renderAll();renderProjectList();updateHistoryButtons();
+function activateWorkspace(){
+  migrateLegacyWorkspace();
+  let next=null;
+  try{next=JSON.parse(localStorage.getItem(activeDraftStorageKey()))}catch{}
+  const newestProject=projectStore()[0];
+  if(newestProject&&Number(newestProject.updatedAt)>Number(next?.updatedAt||0))next=newestProject;
+  if(!next)next=blankProject();
+  state={...blankProject(),...structuredClone(next)};undoStack=[];redoStack=[];ensureCells();renderAll();renderProjectList();updateHistoryButtons();
+}
+window.balloonWorkspace={
+  activate:activateWorkspace,
+  activeProjectStorageKey,
+  activeDraftStorageKey,
+  guestProjects:()=>readProjects(`${storageKey}:guest`),
+  guestDraft:()=>{try{return JSON.parse(localStorage.getItem(`${draftStorageKey}:guest`))}catch{return null}},
+  writeActive:projects=>writeProjects(projects),
+  clearGuest:()=>{localStorage.removeItem(`${storageKey}:guest`);localStorage.removeItem(`${draftStorageKey}:guest`);localStorage.removeItem(storageKey);localStorage.removeItem(draftStorageKey)}
+};
+window.addEventListener('storage',event=>{if(event.key===activeProjectStorageKey())toast('Projetos atualizados em outra aba. Salve para preservar esta edição ou reabra a biblioteca.');});
+activateWorkspace();

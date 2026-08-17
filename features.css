@@ -65,6 +65,7 @@ dialog {
 
 .empty-state b { color: var(--ink); }
 .empty-state p { margin: 7px 0 0; }
+.gallery-card.shared-project { outline: 3px solid var(--violet); outline-offset: 4px; }
 
 .project-card-actions {
   flex-wrap: wrap;

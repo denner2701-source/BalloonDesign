@@ -19,6 +19,7 @@
   let ownLikes = new Set();
   let followedProfiles = new Set();
   let galleryScope = 'all';
+  const sharedProjectId = () => new URLSearchParams(location.hash.replace(/^#/, '')).get('gallery');
 
   const normalized = (row, profile) => ({ id: row.id, title: row.title, tags: row.tags || [], author: profile?.display_name || profile?.username || 'Decorador da comunidade', username: profile?.username || '', ownerId: row.owner_id, likeCount: row.like_count || 0, project: { ...(row.project_data || {}), shape: normalizeShape(row.shape || row.project_data?.shape) }, cloud: true });
   function filtered() {
@@ -35,6 +36,8 @@
     const emptyCopy = !window.balloonSession && authenticatedScope ? '<div class="empty-state"><b>Entre para usar esta área</b><p>Seus projetos publicados e os perfis seguidos aparecem aqui.</p><button class="text-button" data-gallery-login>Entrar na conta</button></div>' : galleryScope === 'following' ? '<div class="empty-state"><b>Nenhum projeto de perfis seguidos</b><p>Na aba Geral, siga decoradores para montar seu feed.</p></div>' : '<div class="empty-state"><b>Nenhum projeto encontrado</b><p>Limpe os filtros ou publique o primeiro projeto.</p></div>';
     $('#gallery-list').innerHTML = items.length ? items.map(item => `<article class="project-card gallery-card"><div class="project-thumb"><canvas width="300" height="180" data-gallery-canvas="${item.id}"></canvas></div><div class="project-card-body"><div class="gallery-meta"><span>${escapeHtml(item.author)}${item.username ? ` <small>@${escapeHtml(item.username)}</small>` : ''}</span><small>${shapeLabel(item.project.shape)}</small></div><h3>${escapeHtml(item.title)}</h3><div class="tag-list">${item.tags.slice(0, 4).map(tag => `<span>#${escapeHtml(tag)}</span>`).join('')}</div><div class="project-card-actions"><button data-gallery-duplicate="${item.id}">Duplicar</button><button data-gallery-share="${item.id}">Compartilhar</button>${item.cloud ? `<button class="${ownLikes.has(item.id) ? 'liked' : ''}" data-gallery-like="${item.id}">♥ ${item.likeCount}</button>` : ''}${item.cloud && item.ownerId !== window.balloonSession?.user?.id ? `<button class="${followedProfiles.has(item.ownerId) ? 'following' : ''}" data-gallery-follow="${item.id}">${followedProfiles.has(item.ownerId) ? 'Seguindo' : 'Seguir'}</button><button data-gallery-report="${item.id}">Denunciar</button>` : ''}${item.cloud && item.ownerId === window.balloonSession?.user?.id ? `<button class="danger-action" data-gallery-delete="${item.id}">Remover</button>` : ''}</div></div></article>`).join('') : emptyCopy;
     items.forEach(item => { const target = $(`[data-gallery-canvas="${item.id}"]`); if (target) miniProject(target, structuredClone(item.project)); });
+    const sharedId=sharedProjectId(),sharedCard=sharedId?$(`[data-gallery-canvas="${CSS.escape(sharedId)}"]`)?.closest('.gallery-card'):null;
+    if(sharedCard){sharedCard.classList.add('shared-project');queueMicrotask(()=>sharedCard.scrollIntoView({block:'center'}));}
   }
   async function loadGallery() {
     if (!window.balloonCloud) { renderGallery(); return; }
@@ -71,7 +74,7 @@
       state = { ...structuredClone(item.project), id: crypto.randomUUID(), name: `Cópia de ${item.title}`, updatedAt: Date.now() };
       ensureCells(); await saveProject(); activateView('studio'); renderAll(); toast('Modelo duplicado em Meus projetos.');
     } else if (event.target.dataset.galleryShare) {
-      const share = { title: item.title, text: `Inspiração BalloonDesign: ${item.title}`, url: location.href.split('#')[0] };
+      const share = { title: item.title, text: `Inspiração BalloonDesign: ${item.title}`, url: `${location.href.split('#')[0]}#gallery=${encodeURIComponent(item.id)}` };
       if (navigator.share) await navigator.share(share).catch(() => {}); else { await navigator.clipboard.writeText(`${share.text} — ${share.url}`); toast('Link copiado.'); }
     } else if (event.target.dataset.galleryLike) {
       if (!window.balloonSession) { $('#profile-button').click(); return; }
@@ -124,6 +127,9 @@
   window.addEventListener('balloon-profile-change', loadGallery);
   const previousActivate = activateView;
   activateView = view => { previousActivate(view); if (view === 'gallery') void loadGallery(); };
+  const openSharedProject=()=>{if(sharedProjectId()){activateView('gallery');renderGallery();}};
+  window.addEventListener('hashchange',openSharedProject);
+  window.addEventListener('load',openSharedProject,{once:true});
   renderGallery();
-  setTimeout(() => void loadGallery(), 0);
+  setTimeout(() => {openSharedProject();void loadGallery();}, 0);
 })();
